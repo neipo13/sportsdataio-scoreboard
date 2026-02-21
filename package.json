@@ -1,15 +1,19 @@
 {
-  "name": "sdio-temp",
+  "name": "sdio-client-monitor",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sdk:download": "tsx scripts/download-specs.ts",
+    "sdk:generate": "tsx scripts/generate-sdk.ts",
+    "sdk:refresh": "npm run sdk:download && npm run sdk:generate"
   },
   "dependencies": {
     "next": "16.1.6",
+    "openapi-fetch": "^0.17.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -20,7 +24,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

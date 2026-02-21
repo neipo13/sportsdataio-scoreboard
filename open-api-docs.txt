@@ -1,0 +1,13 @@
+https://cdn.sportsdata.io/openapi/NHL-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/NFL-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/NBA-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/MLB-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/CFB-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/CBB-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/SOCCER-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/GOLF-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/NASCAR-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/WNBA-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/MMA-openapi-3.1.json
+https://cdn.sportsdata.io/openapi/CWBB-openapi-3.1.json
+

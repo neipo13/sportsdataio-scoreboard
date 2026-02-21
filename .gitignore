@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# downloaded OpenAPI specs (regenerate with npm run sdk:download)
+/specs/
+
+# claude settings
+.claude/settings.local.json
