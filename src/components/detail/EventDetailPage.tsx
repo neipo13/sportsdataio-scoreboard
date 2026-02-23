@@ -77,18 +77,20 @@ export function EventDetailPage({
             const result = await section.fetch(fetchCtx);
 
             // Extract header info from box score or first successful fetch
-            if (result.data && typeof result.data === "object" && "Game" in (result.data as Record<string, unknown>)) {
-              const game = (result.data as { Game?: Record<string, unknown> }).Game;
+            // NFL uses "Score" instead of "Game", and different field names
+            if (result.data && typeof result.data === "object") {
+              const rd = result.data as Record<string, unknown>;
+              const game = (rd.Game ?? rd.Score) as Record<string, unknown> | undefined;
               if (game) {
                 setHeaderInfo((prev) => prev ?? {
                   homeTeam: (game.HomeTeam as string) ?? null,
                   awayTeam: (game.AwayTeam as string) ?? null,
-                  homeScore: (game.HomeTeamScore as number) ?? null,
-                  awayScore: (game.AwayTeamScore as number) ?? null,
+                  homeScore: (game.HomeTeamScore as number) ?? (game.HomeScore as number) ?? null,
+                  awayScore: (game.AwayTeamScore as number) ?? (game.AwayScore as number) ?? null,
                   status: normalizeStatus(game.Status as string),
                   gameStatus: null,
                   eventName: null,
-                  dateTime: (game.DateTime as string) ?? null,
+                  dateTime: (game.DateTime as string) ?? (game.Date as string) ?? null,
                 });
               }
             }
@@ -201,7 +203,7 @@ export function EventDetailPage({
           <SectionError message={activeSectionState.error ?? "Failed to load"} />
         )}
         {activeSectionState?.status === "loaded" && activeSection && fetchCtx && (
-          <activeSection.component data={activeSectionState.data} ctx={fetchCtx} />
+          <activeSection.component data={activeSectionState.data} ctx={fetchCtx} fetchLineMovement={activeSection.fetchLineMovement} />
         )}
         {!activeSectionState && availableTabs.length === 0 && (
           <SectionSkeleton />

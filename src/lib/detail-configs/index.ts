@@ -1,8 +1,21 @@
 import type { DetailRegistry } from "../detail-registry";
-import { nbaSections } from "./team-sports";
+import {
+  nbaSections,
+  nflSections,
+  nhlSections,
+  mlbSections,
+  cbbSections,
+  cfbSections,
+  wnbaSections,
+} from "./team-sports";
 
 export const DETAIL_REGISTRY: DetailRegistry = {
   nba: { sections: nbaSections },
-  // Future: nfl, nhl, mlb, cbb, cfb, wnba, soccer, golf, nascar, mma
+  nfl: { sections: nflSections },
+  nhl: { sections: nhlSections },
+  mlb: { sections: mlbSections },
+  cbb: { sections: cbbSections },
+  cfb: { sections: cfbSections },
+  wnba: { sections: wnbaSections },
   // cwbb intentionally omitted — no detail endpoints
 };

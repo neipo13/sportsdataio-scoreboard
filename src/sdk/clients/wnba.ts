@@ -19,6 +19,29 @@ export async function getStadiums() {
   return { data, error, response };
 }
 
+export async function getBoxScore(gameId: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/wnba/scores/{format}/BoxScore/{gameid}",
+    { params: { path: { format: "JSON", gameid: gameId } } },
+  );
+  return { data, error, response };
+}
+
+export async function getBettingMarkets(gameId: string, sbGroup?: string) {
+  if (sbGroup) {
+    const { data, error, response } = await client.GET(
+      "/v3/wnba/scores/{format}/BettingMarketsByGameID/{gameID}/{sportsbookgroup}",
+      { params: { path: { format: "JSON", gameID: gameId, sportsbookgroup: sbGroup } } },
+    );
+    return { data, error, response };
+  }
+  const { data, error, response } = await client.GET(
+    "/v3/wnba/scores/{format}/BettingMarketsByGameID/{gameID}",
+    { params: { path: { format: "JSON", gameID: gameId } } },
+  );
+  return { data, error, response };
+}
+
 export async function probe() {
   const { response } = await getGamesByDate(new Date());
   return response.status !== 401;

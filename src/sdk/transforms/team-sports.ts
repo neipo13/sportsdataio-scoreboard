@@ -193,7 +193,7 @@ export function transformNflGames(games: NflScore[], opts?: TransformOpts): Norm
 
     return {
       ...emptyEvent(),
-      id: `nfl-${g.GameKey ?? g.GlobalGameID}`,
+      id: `nfl-${g.ScoreID}`,
       sport: "team" as const,
       sportKey: "nfl",
       sportLabel: "NFL",

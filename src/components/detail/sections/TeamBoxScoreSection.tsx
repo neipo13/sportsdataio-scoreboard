@@ -45,7 +45,15 @@ function StatCell({ value }: { value: number | null | undefined }) {
   );
 }
 
-function PlayerTable({ players, teamLabel }: { players: PlayerGame[]; teamLabel: string }) {
+function PlayerTable({
+  players,
+  teamLabel,
+  showPlusMinus,
+}: {
+  players: PlayerGame[];
+  teamLabel: string;
+  showPlusMinus: boolean;
+}) {
   // Sort: starters first (Started=1), then by minutes descending
   const sorted = [...players].sort((a, b) => {
     const aStart = a.Started === 1 ? 0 : 1;
@@ -74,7 +82,9 @@ function PlayerTable({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
               <th className="px-2 py-1.5 text-right font-medium">FG</th>
               <th className="px-2 py-1.5 text-right font-medium">3P</th>
               <th className="px-2 py-1.5 text-right font-medium">FT</th>
-              <th className="px-2 py-1.5 text-right font-medium">+/-</th>
+              {showPlusMinus && (
+                <th className="px-2 py-1.5 text-right font-medium">+/-</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -109,7 +119,7 @@ function PlayerTable({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
                 <td className="whitespace-nowrap px-2 py-1.5 text-right tabular-nums text-zinc-700 dark:text-zinc-300">
                   {p.FreeThrowsMade ?? 0}-{p.FreeThrowsAttempted ?? 0}
                 </td>
-                <StatCell value={p.PlusMinus} />
+                {showPlusMinus && <StatCell value={p.PlusMinus} />}
               </tr>
             ))}
           </tbody>
@@ -119,7 +129,7 @@ function PlayerTable({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
   );
 }
 
-export function TeamBoxScoreSection({ data }: { data: unknown; ctx: FetchContext }) {
+export function BasketballBoxScoreSection({ data, ctx }: { data: unknown; ctx: FetchContext }) {
   const boxScore = data as BoxScoreData;
   const players = boxScore?.PlayerGames ?? [];
   const game = boxScore?.Game;
@@ -132,6 +142,9 @@ export function TeamBoxScoreSection({ data }: { data: unknown; ctx: FetchContext
     );
   }
 
+  // CBB has no PlusMinus field
+  const showPlusMinus = ctx.parsed.sportKey !== "cbb";
+
   const awayTeam = game?.AwayTeam ?? "Away";
   const homeTeam = game?.HomeTeam ?? "Home";
   const awayPlayers = players.filter((p) => p.HomeOrAway === "AWAY" || p.Team === awayTeam);
@@ -139,8 +152,11 @@ export function TeamBoxScoreSection({ data }: { data: unknown; ctx: FetchContext
 
   return (
     <div>
-      <PlayerTable players={awayPlayers} teamLabel={awayTeam} />
-      <PlayerTable players={homePlayers} teamLabel={homeTeam} />
+      <PlayerTable players={awayPlayers} teamLabel={awayTeam} showPlusMinus={showPlusMinus} />
+      <PlayerTable players={homePlayers} teamLabel={homeTeam} showPlusMinus={showPlusMinus} />
     </div>
   );
 }
+
+/** @deprecated Use BasketballBoxScoreSection */
+export const TeamBoxScoreSection = BasketballBoxScoreSection;

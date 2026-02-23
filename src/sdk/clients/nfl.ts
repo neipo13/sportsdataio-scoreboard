@@ -19,6 +19,46 @@ export async function getStadiums() {
   return { data, error, response };
 }
 
+export async function getBoxScore(scoreId: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/stats/{format}/BoxScoreByScoreIDV3/{scoreid}",
+    { params: { path: { format: "JSON", scoreid: scoreId } } },
+  );
+  return { data, error, response };
+}
+
+export async function getPlayByPlay(gameId: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/pbp/{format}/PlayByPlay/{gameid}",
+    { params: { path: { format: "JSON", gameid: gameId } } },
+  );
+  return { data, error, response };
+}
+
+export async function getBettingMarkets(gameId: string, sbGroup: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/odds/{format}/BettingMarketsByGameID/{gameid}/{sportsbookgroup}",
+    { params: { path: { format: "JSON", gameid: gameId, sportsbookgroup: sbGroup } } },
+  );
+  return { data, error, response };
+}
+
+export async function getPregameLineMovement(scoreId: string, sbGroup: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/odds/{format}/PreGameOddsLineMovement/{scoreid}/{sportsbookgroup}",
+    { params: { path: { format: "JSON", scoreid: scoreId, sportsbookgroup: sbGroup } } },
+  );
+  return { data, error, response };
+}
+
+export async function getInplayLineMovement(scoreId: string, sbGroup: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/odds/{format}/InGameLineMovement/{scoreid}/{sportsbookgroup}",
+    { params: { path: { format: "JSON", scoreid: scoreId, sportsbookgroup: sbGroup } } },
+  );
+  return { data, error, response };
+}
+
 export async function probe() {
   const { response } = await getGamesByDate(new Date());
   return response.status !== 401;

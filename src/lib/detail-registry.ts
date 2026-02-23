@@ -23,8 +23,10 @@ export interface DetailSectionConfig<T = unknown> {
   label: string;
   /** Fetch data for this section. Throw on error. Return { data, status }. */
   fetch: (ctx: FetchContext) => Promise<SectionFetchResult<T>>;
+  /** Optional: fetch line movement data (for odds sections) */
+  fetchLineMovement?: (ctx: FetchContext) => Promise<SectionFetchResult>;
   /** Component to render the section data */
-  component: ComponentType<{ data: T; ctx: FetchContext }>;
+  component: ComponentType<{ data: T; ctx: FetchContext; fetchLineMovement?: (ctx: FetchContext) => Promise<SectionFetchResult> }>;
 }
 
 /** Per-sport detail configuration */

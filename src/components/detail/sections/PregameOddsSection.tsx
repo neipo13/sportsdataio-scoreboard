@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { FetchContext } from "../../../lib/detail-registry";
-import { nba } from "../../../sdk/clients/index";
+import type { FetchContext, SectionFetchResult } from "../../../lib/detail-registry";
 
 interface GameOdd {
   GameOddId?: number;
@@ -32,7 +31,7 @@ function formatOdds(value: number | null | undefined): string {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
-export function PregameOddsSection({ data, ctx }: { data: unknown; ctx: FetchContext }) {
+export function PregameOddsSection({ data, ctx, fetchLineMovement }: { data: unknown; ctx: FetchContext; fetchLineMovement?: (ctx: FetchContext) => Promise<SectionFetchResult> }) {
   const allGames = (data ?? []) as GameInfo[];
   const gameId = Number(ctx.parsed.rawId);
   const game = allGames.find((g) => g.GameId === gameId);
@@ -46,9 +45,10 @@ export function PregameOddsSection({ data, ctx }: { data: unknown; ctx: FetchCon
       setLineMovement(null);
       return;
     }
+    if (!fetchLineMovement) return;
     setLoadingLM(true);
     try {
-      const result = await nba.getPregameLineMovement(ctx.parsed.rawId, ctx.sportsbookGroup);
+      const result = await fetchLineMovement(ctx);
       // Response is GameInfo[] — find our game and get PregameOdds
       const games = (result.data ?? []) as GameInfo[];
       const found = games.find((g) => g.GameId === gameId);
@@ -58,7 +58,7 @@ export function PregameOddsSection({ data, ctx }: { data: unknown; ctx: FetchCon
     } finally {
       setLoadingLM(false);
     }
-  }, [lineMovement, ctx.parsed.rawId, ctx.sportsbookGroup, gameId]);
+  }, [lineMovement, ctx, fetchLineMovement, gameId]);
 
   if (!game) {
     return (
@@ -72,13 +72,15 @@ export function PregameOddsSection({ data, ctx }: { data: unknown; ctx: FetchCon
     <div>
       <OddsTable odds={odds} label="Current Pregame Odds" />
 
-      <button
-        onClick={handleLoadLineMovement}
-        disabled={loadingLM}
-        className="mt-4 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-      >
-        {loadingLM ? "Loading..." : lineMovement ? "Hide Line Movement" : "Show Line Movement"}
-      </button>
+      {fetchLineMovement && (
+        <button
+          onClick={handleLoadLineMovement}
+          disabled={loadingLM}
+          className="mt-4 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          {loadingLM ? "Loading..." : lineMovement ? "Hide Line Movement" : "Show Line Movement"}
+        </button>
+      )}
 
       {lineMovement && lineMovement.length > 0 && (
         <div className="mt-3">
