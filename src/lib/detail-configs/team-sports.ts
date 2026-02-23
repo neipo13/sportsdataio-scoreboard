@@ -7,6 +7,9 @@ import { HockeyBoxScoreSection } from "../../components/detail/sections/HockeyBo
 import { BaseballBoxScoreSection } from "../../components/detail/sections/BaseballBoxScoreSection";
 import { LineScoreSection } from "../../components/detail/sections/LineScoreSection";
 import { PlayByPlaySection } from "../../components/detail/sections/PlayByPlaySection";
+import { FootballPlayByPlaySection } from "../../components/detail/sections/FootballPlayByPlaySection";
+import { HockeyPlayByPlaySection } from "../../components/detail/sections/HockeyPlayByPlaySection";
+import { BaseballPlayByPlaySection } from "../../components/detail/sections/BaseballPlayByPlaySection";
 import { BettingDataSection } from "../../components/detail/sections/BettingDataSection";
 import { PregameOddsSection } from "../../components/detail/sections/PregameOddsSection";
 import { InplayOddsSection } from "../../components/detail/sections/InplayOddsSection";
@@ -65,12 +68,12 @@ function makeLineScore(client: BoxScoreClient): DetailSectionConfig {
   };
 }
 
-function makePlayByPlay(client: PlayByPlayClient): DetailSectionConfig {
+function makePlayByPlay(client: PlayByPlayClient, component: SectionComponent = PlayByPlaySection): DetailSectionConfig {
   return {
     key: "playbyplay",
     label: "Play-by-Play",
     fetch: async (ctx: FetchContext) => fetchOrThrow(await client.getPlayByPlay(ctx.parsed.rawId)),
-    component: PlayByPlaySection,
+    component,
   };
 }
 
@@ -122,7 +125,7 @@ export const nbaSections: DetailSectionConfig[] = [
 export const nflSections: DetailSectionConfig[] = [
   makeBoxScore(nfl, FootballBoxScoreSection),
   makeLineScore(nfl),
-  makePlayByPlay(nfl),
+  makePlayByPlay(nfl, FootballPlayByPlaySection),
   makeBettingData(nfl),
 ];
 
@@ -130,7 +133,7 @@ export const nflSections: DetailSectionConfig[] = [
 export const nhlSections: DetailSectionConfig[] = [
   makeBoxScore(nhl, HockeyBoxScoreSection),
   makeLineScore(nhl),
-  makePlayByPlay(nhl),
+  makePlayByPlay(nhl, HockeyPlayByPlaySection),
   makeBettingData(nhl),
   makePregameOdds(nhl),
   makeInplayOdds(nhl),
@@ -140,7 +143,7 @@ export const nhlSections: DetailSectionConfig[] = [
 export const mlbSections: DetailSectionConfig[] = [
   makeBoxScore(mlb, BaseballBoxScoreSection),
   makeLineScore(mlb),
-  makePlayByPlay(mlb),
+  makePlayByPlay(mlb, BaseballPlayByPlaySection),
   makeBettingData(mlb),
   makePregameOdds(mlb),
   makeInplayOdds(mlb),

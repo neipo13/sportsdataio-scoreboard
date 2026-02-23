@@ -1,6 +1,7 @@
 "use client";
 
 import type { FetchContext } from "../../../lib/detail-registry";
+import { formatClock, EmptyPlayByPlay, PeriodHeader } from "./pbp-utils";
 
 interface Play {
   PlayID?: number;
@@ -26,11 +27,6 @@ interface PlayByPlayData {
   Plays?: Play[];
 }
 
-function formatTime(min: number | null | undefined, sec: number | null | undefined): string {
-  if (min == null || sec == null) return "";
-  return `${min}:${String(sec).padStart(2, "0")}`;
-}
-
 function playCategoryColor(category: string | null | undefined): string {
   switch (category?.toLowerCase()) {
     case "shot":
@@ -51,11 +47,7 @@ export function PlayByPlaySection({ data }: { data: unknown; ctx: FetchContext }
   const plays = pbp?.Plays ?? [];
 
   if (plays.length === 0) {
-    return (
-      <p className="py-4 text-center text-sm text-zinc-400">
-        No play-by-play data available
-      </p>
-    );
+    return <EmptyPlayByPlay />;
   }
 
   // Sort by sequence descending (most recent first)
@@ -74,9 +66,9 @@ export function PlayByPlaySection({ data }: { data: unknown; ctx: FetchContext }
     <div className="space-y-4">
       {Array.from(byQuarter.entries()).map(([quarter, quarterPlays]) => (
         <div key={quarter}>
-          <h4 className="sticky top-0 z-10 mb-2 bg-white py-1 text-xs font-semibold uppercase text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
+          <PeriodHeader>
             {/^\d+$/.test(quarter) ? `Q${quarter}` : quarter}
-          </h4>
+          </PeriodHeader>
           <div className="space-y-0.5">
             {quarterPlays.map((play) => (
               <div
@@ -84,7 +76,7 @@ export function PlayByPlaySection({ data }: { data: unknown; ctx: FetchContext }
                 className="flex items-start gap-2 rounded px-2 py-1 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
               >
                 <span className="w-10 shrink-0 tabular-nums text-zinc-400">
-                  {formatTime(play.TimeRemainingMinutes, play.TimeRemainingSeconds)}
+                  {formatClock(play.TimeRemainingMinutes, play.TimeRemainingSeconds)}
                 </span>
                 <span className={`w-10 shrink-0 font-medium ${playCategoryColor(play.Category)}`}>
                   {play.Team ?? ""}
