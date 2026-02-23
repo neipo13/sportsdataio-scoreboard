@@ -13,6 +13,7 @@ export interface HeaderInfo {
   gameStatus: string | null;
   eventName: string | null;
   dateTime: string | null;
+  isClosed: boolean;
 }
 
 function formatDateTime(dateTime: string | null): string | null {

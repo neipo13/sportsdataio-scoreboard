@@ -10,6 +10,35 @@ import { DetailHeader, type HeaderInfo } from "./DetailHeader";
 import { DetailTabBar, type TabInfo } from "./DetailTabBar";
 import { SectionSkeleton } from "./SectionSkeleton";
 import { SectionError } from "./SectionError";
+import { LastPolled } from "../LastPolled";
+
+const LIVE_POLL_KEYS = new Set(["boxscore", "linescore", "playbyplay", "inplay-odds"]);
+const PREGAME_POLL_KEYS = new Set(["betting", "pregame-odds", "projections"]);
+const LIVE_INTERVAL_MS = 5_000;
+const PREGAME_INTERVAL_MS = 60_000;
+
+type GamePhase = "pregame" | "live" | "closed" | "unknown";
+
+function getGamePhase(info: HeaderInfo | null): GamePhase {
+  if (!info) return "unknown";
+  if (info.isClosed) return "closed";
+
+  const { status, dateTime } = info;
+  if (status === "InProgress" || status === "Suspended" || status === "Delayed") return "live";
+
+  if (status === "Scheduled") {
+    if (dateTime) {
+      const start = new Date(dateTime).getTime();
+      if (start <= Date.now()) return "live";
+    }
+    return "pregame";
+  }
+
+  if (status === "Final") return "closed";
+
+  // Canceled, Postponed, Unknown
+  return "unknown";
+}
 
 const DEFAULT_SB_GROUP = "G1001";
 const SB_GROUP_KEY = "sdio-sportsbook-group";
@@ -42,7 +71,10 @@ export function EventDetailPage({
   const [availableTabs, setAvailableTabs] = useState<TabInfo[]>([]);
   const [activeTab, setActiveTab] = useState<string>(initialTab ?? "");
   const [headerInfo, setHeaderInfo] = useState<HeaderInfo | null>(null);
+  const [lastPolled, setLastPolled] = useState<Date | null>(null);
   const probeRanRef = useRef(false);
+  const headerInfoRef = useRef<HeaderInfo | null>(null);
+  const sectionStatesRef = useRef<Record<string, SectionState>>({});
 
   // Save sportsbook group to localStorage
   const handleSbGroupChange = useCallback((value: string) => {
@@ -91,6 +123,7 @@ export function EventDetailPage({
                   gameStatus: null,
                   eventName: null,
                   dateTime: (game.DateTime as string) ?? (game.Date as string) ?? null,
+                  isClosed: !!(game.IsClosed),
                 });
               }
             }
@@ -142,6 +175,93 @@ export function EventDetailPage({
     };
 
     probeAll();
+  }, [fetchCtx, sections]);
+
+  // Keep refs in sync so polling reads fresh state without re-triggering intervals
+  useEffect(() => { headerInfoRef.current = headerInfo; }, [headerInfo]);
+  useEffect(() => { sectionStatesRef.current = sectionStates; }, [sectionStates]);
+
+  // Polling for live & pregame data
+  useEffect(() => {
+    if (!fetchCtx || sections.length === 0) return;
+
+    let lastPregamePoll = 0;
+    let polling = false;
+
+    const tick = async () => {
+      const info = headerInfoRef.current;
+      const phase = getGamePhase(info);
+      if (phase === "closed" || phase === "unknown" || polling) return;
+
+      const states = sectionStatesRef.current;
+      const now = Date.now();
+
+      // Determine which section keys to re-fetch this tick
+      let keysToFetch: string[];
+      if (phase === "live") {
+        keysToFetch = sections
+          .filter((s) => LIVE_POLL_KEYS.has(s.key) && states[s.key]?.status === "loaded")
+          .map((s) => s.key);
+      } else {
+        // pregame — only poll if enough time has passed
+        if (now - lastPregamePoll < PREGAME_INTERVAL_MS) return;
+        keysToFetch = sections
+          .filter((s) => PREGAME_POLL_KEYS.has(s.key) && states[s.key]?.status === "loaded")
+          .map((s) => s.key);
+      }
+
+      if (keysToFetch.length === 0) return;
+      polling = true;
+
+      try {
+        const results = await Promise.allSettled(
+          keysToFetch.map(async (key) => {
+            const section = sections.find((s) => s.key === key)!;
+            const result = await section.fetch(fetchCtx);
+            return { key, result };
+          }),
+        );
+
+        for (const r of results) {
+          if (r.status !== "fulfilled") continue;
+          const { key, result } = r.value;
+
+          setSectionStates((prev) => ({
+            ...prev,
+            [key]: { status: "loaded", data: result.data, error: null },
+          }));
+
+          // Update header from boxscore refreshes
+          if (key === "boxscore" && result.data && typeof result.data === "object") {
+            const rd = result.data as Record<string, unknown>;
+            const game = (rd.Game ?? rd.Score) as Record<string, unknown> | undefined;
+            if (game) {
+              setHeaderInfo({
+                homeTeam: (game.HomeTeam as string) ?? null,
+                awayTeam: (game.AwayTeam as string) ?? null,
+                homeScore: (game.HomeTeamScore as number) ?? (game.HomeScore as number) ?? null,
+                awayScore: (game.AwayTeamScore as number) ?? (game.AwayScore as number) ?? null,
+                status: normalizeStatus(game.Status as string),
+                gameStatus: (game.GameStatus as string) ?? null,
+                eventName: null,
+                dateTime: (game.DateTime as string) ?? (game.Date as string) ?? null,
+                isClosed: !!(game.IsClosed),
+              });
+            }
+          }
+        }
+
+        if (phase === "pregame") lastPregamePoll = now;
+        setLastPolled(new Date());
+      } catch {
+        // Silently ignore poll errors — keep showing stale data
+      } finally {
+        polling = false;
+      }
+    };
+
+    const id = setInterval(tick, LIVE_INTERVAL_MS);
+    return () => clearInterval(id);
   }, [fetchCtx, sections]);
 
   // Handle tab selection — update URL hash
@@ -209,6 +329,10 @@ export function EventDetailPage({
           <SectionSkeleton />
         )}
       </div>
+
+      {lastPolled && getGamePhase(headerInfo) !== "closed" && getGamePhase(headerInfo) !== "unknown" && (
+        <LastPolled timestamp={lastPolled} />
+      )}
     </div>
   );
 }
