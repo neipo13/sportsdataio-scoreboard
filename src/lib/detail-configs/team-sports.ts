@@ -111,11 +111,82 @@ function makeInplayOdds(client: InplayOddsClient): DetailSectionConfig {
   };
 }
 
+// -- Projection helpers --
+
+function wrapAsBoxScore(players: Record<string, unknown>[]) {
+  const home = players.find((p) => p.HomeOrAway === "HOME");
+  const away = players.find((p) => p.HomeOrAway === "AWAY");
+  return {
+    Game: {
+      HomeTeam: (home?.Team as string) ?? null,
+      AwayTeam: (away?.Team as string) ?? null,
+    },
+    PlayerGames: players,
+  };
+}
+
+type DateProjectionClient = {
+  getProjectionsByDate: (date: Date) => Promise<{ data: unknown; response: Response }>;
+};
+
+function makeDateProjections(
+  client: DateProjectionClient,
+  component: SectionComponent,
+): DetailSectionConfig {
+  return {
+    key: "projections",
+    label: "Projections",
+    fetch: async (ctx: FetchContext) => {
+      const result = await client.getProjectionsByDate(new Date(ctx.date + "T12:00:00"));
+      if (result.response.status === 401) throw new HttpError(401, "Unauthorized");
+      if (!result.response.ok) throw new HttpError(result.response.status, `HTTP ${result.response.status}`);
+      const all = (result.data ?? []) as Record<string, unknown>[];
+      const gameId = parseInt(ctx.parsed.rawId, 10);
+      const filtered = all.filter((p) => p.GameID === gameId);
+      return { data: wrapAsBoxScore(filtered), status: result.response.status };
+    },
+    component,
+  };
+}
+
+function makeNflProjections(component: SectionComponent): DetailSectionConfig {
+  return {
+    key: "projections",
+    label: "Projections",
+    fetch: async (ctx: FetchContext) => {
+      // Step 1: fetch box score to extract Season, Week, GameKey
+      const boxResult = await nfl.getBoxScore(ctx.parsed.rawId);
+      if (boxResult.response.status === 401) throw new HttpError(401, "Unauthorized");
+      if (!boxResult.response.ok) throw new HttpError(boxResult.response.status, `HTTP ${boxResult.response.status}`);
+      const score = (boxResult.data as Record<string, unknown>)?.Score as Record<string, unknown> | undefined;
+      const season = score?.Season;
+      const seasonType = score?.SeasonType as number | undefined;
+      const week = score?.Week;
+      const gameKey = score?.GameKey;
+      if (!season || !week || !gameKey) throw new HttpError(404, "Game info not found");
+
+      // Map SeasonType to API format
+      const suffixMap: Record<number, string> = { 1: "REG", 2: "PRE", 3: "POST" };
+      const seasonStr = `${season}${suffixMap[seasonType ?? 1] ?? "REG"}`;
+
+      // Step 2: fetch projections by week, filter by GameKey
+      const result = await nfl.getProjectionsByWeek(seasonStr, String(week));
+      if (result.response.status === 401) throw new HttpError(401, "Unauthorized");
+      if (!result.response.ok) throw new HttpError(result.response.status, `HTTP ${result.response.status}`);
+      const all = (result.data ?? []) as Record<string, unknown>[];
+      const filtered = all.filter((p) => p.GameKey === gameKey);
+      return { data: wrapAsBoxScore(filtered), status: result.response.status };
+    },
+    component,
+  };
+}
+
 // -- NBA: boxscore, linescore, playbyplay, betting, pregameOdds, inplayOdds --
 export const nbaSections: DetailSectionConfig[] = [
   makeBoxScore(nba, BasketballBoxScoreSection),
   makeLineScore(nba),
   makePlayByPlay(nba),
+  makeDateProjections(nba, BasketballBoxScoreSection),
   makeBettingData(nba),
   makePregameOdds(nba),
   makeInplayOdds(nba),
@@ -126,6 +197,7 @@ export const nflSections: DetailSectionConfig[] = [
   makeBoxScore(nfl, FootballBoxScoreSection),
   makeLineScore(nfl),
   makePlayByPlay(nfl, FootballPlayByPlaySection),
+  makeNflProjections(FootballBoxScoreSection),
   makeBettingData(nfl),
 ];
 
@@ -134,6 +206,7 @@ export const nhlSections: DetailSectionConfig[] = [
   makeBoxScore(nhl, HockeyBoxScoreSection),
   makeLineScore(nhl),
   makePlayByPlay(nhl, HockeyPlayByPlaySection),
+  makeDateProjections(nhl, HockeyBoxScoreSection),
   makeBettingData(nhl),
   makePregameOdds(nhl),
   makeInplayOdds(nhl),
@@ -144,6 +217,7 @@ export const mlbSections: DetailSectionConfig[] = [
   makeBoxScore(mlb, BaseballBoxScoreSection),
   makeLineScore(mlb),
   makePlayByPlay(mlb, BaseballPlayByPlaySection),
+  makeDateProjections(mlb, BaseballBoxScoreSection),
   makeBettingData(mlb),
   makePregameOdds(mlb),
   makeInplayOdds(mlb),

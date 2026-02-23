@@ -82,6 +82,14 @@ export async function getInplayLineMovement(gameId: string, sbGroup: string) {
   return { data, error, response };
 }
 
+export async function getProjectionsByDate(date: Date) {
+  const { data, error, response } = await client.GET(
+    "/v3/nhl/projections/{format}/PlayerGameProjectionStatsByDate/{date}",
+    { params: { path: { format: "JSON", date: formatSdioDate(date) } } },
+  );
+  return { data, error, response };
+}
+
 export async function probe() {
   const { response } = await getGamesByDate(new Date());
   return response.status !== 401;

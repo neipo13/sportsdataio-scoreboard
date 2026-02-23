@@ -59,6 +59,14 @@ export async function getInplayLineMovement(scoreId: string, sbGroup: string) {
   return { data, error, response };
 }
 
+export async function getProjectionsByWeek(season: string, week: string) {
+  const { data, error, response } = await client.GET(
+    "/v3/nfl/projections/{format}/PlayerGameProjectionStatsByWeek/{season}/{week}",
+    { params: { path: { format: "JSON", season, week } } },
+  );
+  return { data, error, response };
+}
+
 export async function probe() {
   const { response } = await getGamesByDate(new Date());
   return response.status !== 401;
