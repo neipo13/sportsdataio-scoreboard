@@ -13,98 +13,98 @@ import { CombatEventCard } from "./cards/CombatEventCard";
 import { GolfTournamentCard } from "./cards/GolfTournamentCard";
 
 const COMPETITION_LABELS: Record<string, string> = {
-	EPL: "England - Premier League"
-	DEB: "Germany - Bundesliga"
-	UCL: "Europe - UEFA Champions League"
-	ESP: "Spain - La Liga"
-	ARP: "Argentina - Liga Profesional de Fútbol"
-	ITSA: "Italy - Serie A"
-	NLE: "Netherlands - Eredivisie"
-	MLS: "United States - MLS"
-	UEL: "Europe - UEFA Europa League"
-	COPA: "South America - Copa America"
-	ACN: "Africa - Africa Cup of Nations"
-	LMX: "Mexico - Liga MX"
-	FRL1: "France - Ligue 1"
-	RFPL: "Russia - RFPL"
-	BRSA: "Brazil - Série A"
-	EUC: "Europe - European Championship"
-	UEQ: "Europe - UEFA Euro Qualification"
-	NCAG: "N/C America - CONCACAF Gold Cup"
-	AUA: "Australia - A League"
-	COLI: "South America - Copa Libertadores"
-	FIFA: "World - FIFA World Cup"
-	COSA: "South America - Copa Sudamericana"
-	FPD: "Costa Rica - Liga Promérica"
-	IND: "India - Indian Super League"
-	FIFAF: "World - FIFA Friendlies"
-	TIM: "Italy - Coppa Italia"
-	EFAC: "England - FA Cup"
-	EFLC: "England - Football League Cup"
-	EL1: "England - League One"
-	EL2: "England - League Two"
-	ARCL: "Argentina - Copa Liga Profesional"
-	SAWQ: "South America - WC Qualification"
-	SLIG: "Türkiye - Süper Lig"
-	ELC: "England - Championship"
-	GTM: "Guatemala - Liga Nacional"
-	BRCM: "Brazil - Campeonato Mineiro"
-	ASWQ: "Asia - WC Qualification"
-	AFWQ: "Africa - WC Qualification"
-	NAWQ: "N/C America - WC Qualification"
-	OWQ: "Oceania - WC Qualification"
-	EWQ: "Europe - WC Qualification"
-	NOR1: "Norway - Eliteserien"
-	UPL: "Ukraine - Premier Liha"
-	DEN1: "Denmark - Superliga"
-	ENL: "England - National League"
-	UNL: "Europe - UEFA Nations League"
-	WEUC: "Europe - UEFA Women's EURO"
-	FIFAW: "World - FIFA Women's World Cup"
-	LEC: "N/C America - Leagues Cup"
-	SPL: "Saudi Arabia - Saudi Professional League"
-	SKC: "Saudi Arabia - King Cup"
-	J1L: "Japan - J. League"
-	CONL: "N/C America - Concacaf Nations League"
-	SCOP: "Scotland - Premiership"
-	UCOL: "Europe - UEFA Europa Conference League"
-	BR2: "Brazil - Série B"
-	PR1: "Peru - Primera División"
-	FR2: "France - Ligue 2"
-	CSL: "China PR - Chinese Super League"
-	ITSB: "Italy - Serie B"
-	ES2: "Spain - La Liga 2"
-	HR1: "Croatia - Prva Liga"
-	SVK1: "Slovakia - Nikè Liga"
-	TRSK: "Türkiye - TFF Süper Kupa"
-	PTC: "Portugal - Taça de Portugal"
-	CH1: "Chile - Primera División"
-	ATC: "Austria - ÖFB Cup"
-	COLA: "Colombia - Liga Águila"
-	AUC: "Australia - Australia Cup"
-	GRC: "Greece - Greek Cup "
-	SCOC: "Scotland - Scottish Cup"
-	NLC: "Netherlands - KNVB Beker"
-	BRCO: "Brazil - Copa do Brasil"
-	BL2: "Germany - 2. Bundesliga"
-	CWC: "World - FIFA Club World Cup"
-	POR1: "Portugal - Liga Portugal"
-	CDR: "Spain - Copa del Rey"
-	CDF: "France - Coupe de France"
-	DFBP: "Germany - DFB-Pokal"
-	KL1: "Korea Republic - K League 1"
-	J2L: "Japan - J2 League"
-	NWSL: "United States - NWSL"
-	UWCL: "Europe - UEFA Women's Champions League"
-	ICWQ: "World - WCQ Inter-Confederation Playoffs"
-	J1VL: "Japan - J1 100 Year Vision League"
-	J2VL: "Japan - J2/J3 100 Year Vision League"
-	ESSC: "Spain - Supercopa de España"
-	MAR1: "Morocco - Botola Pro"
-	EGY1: "Egypt - Egyptian Premier League"
-	CZE1: "Czechia - Fortuna Liga"
-	BOL1: "Bolivia - LFPB"
-	ROU1: "Romania - SuperLiga"
+	EPL: "England - Premier League",
+	DEB: "Germany - Bundesliga",
+	UCL: "Europe - UEFA Champions League",
+	ESP: "Spain - La Liga",
+	ARP: "Argentina - Liga Profesional de Fútbol",
+	ITSA: "Italy - Serie A",
+	NLE: "Netherlands - Eredivisie",
+	MLS: "United States - MLS",
+	UEL: "Europe - UEFA Europa League",
+	COPA: "South America - Copa America",
+	ACN: "Africa - Africa Cup of Nations",
+	LMX: "Mexico - Liga MX",
+	FRL1: "France - Ligue 1",
+	RFPL: "Russia - RFPL",
+	BRSA: "Brazil - Série A",
+	EUC: "Europe - European Championship",
+	UEQ: "Europe - UEFA Euro Qualification",
+	NCAG: "N/C America - CONCACAF Gold Cup",
+	AUA: "Australia - A League",
+	COLI: "South America - Copa Libertadores",
+	FIFA: "World - FIFA World Cup",
+	COSA: "South America - Copa Sudamericana",
+	FPD: "Costa Rica - Liga Promérica",
+	IND: "India - Indian Super League",
+	FIFAF: "World - FIFA Friendlies",
+	TIM: "Italy - Coppa Italia",
+	EFAC: "England - FA Cup",
+	EFLC: "England - Football League Cup",
+	EL1: "England - League One",
+	EL2: "England - League Two",
+	ARCL: "Argentina - Copa Liga Profesional",
+	SAWQ: "South America - WC Qualification",
+	SLIG: "Türkiye - Süper Lig",
+	ELC: "England - Championship",
+	GTM: "Guatemala - Liga Nacional",
+	BRCM: "Brazil - Campeonato Mineiro",
+	ASWQ: "Asia - WC Qualification",
+	AFWQ: "Africa - WC Qualification",
+	NAWQ: "N/C America - WC Qualification",
+	OWQ: "Oceania - WC Qualification",
+	EWQ: "Europe - WC Qualification",
+	NOR1: "Norway - Eliteserien",
+	UPL: "Ukraine - Premier Liha",
+	DEN1: "Denmark - Superliga",
+	ENL: "England - National League",
+	UNL: "Europe - UEFA Nations League",
+	WEUC: "Europe - UEFA Women's EURO",
+	FIFAW: "World - FIFA Women's World Cup",
+	LEC: "N/C America - Leagues Cup",
+	SPL: "Saudi Arabia - Saudi Professional League",
+	SKC: "Saudi Arabia - King Cup",
+	J1L: "Japan - J. League",
+	CONL: "N/C America - Concacaf Nations League",
+	SCOP: "Scotland - Premiership",
+	UCOL: "Europe - UEFA Europa Conference League",
+	BR2: "Brazil - Série B",
+	PR1: "Peru - Primera División",
+	FR2: "France - Ligue 2",
+	CSL: "China PR - Chinese Super League",
+	ITSB: "Italy - Serie B",
+	ES2: "Spain - La Liga 2",
+	HR1: "Croatia - Prva Liga",
+	SVK1: "Slovakia - Nikè Liga",
+	TRSK: "Türkiye - TFF Süper Kupa",
+	PTC: "Portugal - Taça de Portugal",
+	CH1: "Chile - Primera División",
+	ATC: "Austria - ÖFB Cup",
+	COLA: "Colombia - Liga Águila",
+	AUC: "Australia - Australia Cup",
+	GRC: "Greece - Greek Cup ",
+	SCOC: "Scotland - Scottish Cup",
+	NLC: "Netherlands - KNVB Beker",
+	BRCO: "Brazil - Copa do Brasil",
+	BL2: "Germany - 2. Bundesliga",
+	CWC: "World - FIFA Club World Cup",
+	POR1: "Portugal - Liga Portugal",
+	CDR: "Spain - Copa del Rey",
+	CDF: "France - Coupe de France",
+	DFBP: "Germany - DFB-Pokal",
+	KL1: "Korea Republic - K League 1",
+	J2L: "Japan - J2 League",
+	NWSL: "United States - NWSL",
+	UWCL: "Europe - UEFA Women's Champions League",
+	ICWQ: "World - WCQ Inter-Confederation Playoffs",
+	J1VL: "Japan - J1 100 Year Vision League",
+	J2VL: "Japan - J2/J3 100 Year Vision League",
+	ESSC: "Spain - Supercopa de España",
+	MAR1: "Morocco - Botola Pro",
+	EGY1: "Egypt - Egyptian Premier League",
+	CZE1: "Czechia - Fortuna Liga",
+	BOL1: "Bolivia - LFPB",
+	ROU1: "Romania - SuperLiga",
 };
 
 export type GetLogoUrl = (sportKey: string, teamKey: string | null) => string | null;
