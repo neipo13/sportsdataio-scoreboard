@@ -1,12 +1,12 @@
 "use client";
 
 import { AppProvider } from "../hooks/useAppState";
-import { Scoreboard } from "../components/Scoreboard";
+import { Router } from "../components/Router";
 
 export default function Home() {
   return (
     <AppProvider>
-      <Scoreboard />
+      <Router />
     </AppProvider>
   );
 }

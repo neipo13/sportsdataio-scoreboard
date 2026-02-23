@@ -181,7 +181,9 @@ export function TeamGameCard({
               type="button"
               className="shrink-0 cursor-copy rounded px-1 py-0.5 font-mono tabular-nums hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               title="Click to copy Game ID"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const rawId = event.id.replace(/^[a-z]+-/, "");
                 navigator.clipboard.writeText(rawId);
               }}

@@ -47,7 +47,9 @@ export function GolfTournamentCard({ event }: { event: NormalizedEvent }) {
             type="button"
             className="cursor-copy rounded px-1 py-0.5 font-mono text-[11px] tabular-nums text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
             title="Click to copy Game ID"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const rawId = event.id.replace(/^[a-z]+-/, "");
               navigator.clipboard.writeText(rawId);
             }}

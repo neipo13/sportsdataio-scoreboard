@@ -101,7 +101,7 @@ export function CombatEventCard({ event }: { event: NormalizedEvent }) {
       )}
 
       <button
-        onClick={handleExpand}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleExpand(); }}
         className="mt-3 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
       >
         {loadingFights
@@ -133,7 +133,9 @@ export function CombatEventCard({ event }: { event: NormalizedEvent }) {
             type="button"
             className="cursor-copy rounded px-1 py-0.5 font-mono text-[11px] tabular-nums text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
             title="Click to copy Game ID"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const rawId = event.id.replace(/^[a-z]+-/, "");
               navigator.clipboard.writeText(rawId);
             }}

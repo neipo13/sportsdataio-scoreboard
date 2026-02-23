@@ -3,6 +3,8 @@
 import type { NormalizedEvent, SportCategory } from "../sdk/transforms/types";
 import type { SportData } from "../hooks/useSportData";
 import type { SportAccess } from "../sdk/clients/probe";
+import { eventDetailHash } from "../lib/event-id";
+import { DETAIL_REGISTRY } from "../lib/detail-configs/index";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { TeamGameCard } from "./cards/TeamGameCard";
 import { SoccerGameCard } from "./cards/SoccerGameCard";
@@ -50,6 +52,11 @@ function CardForSport({
   }
 }
 
+/** Check if a sport has detail sections configured */
+function hasDetailPage(sportKey: string): boolean {
+  return !!(DETAIL_REGISTRY as Record<string, unknown>)[sportKey];
+}
+
 function EventGrid({
   events,
   sport,
@@ -69,9 +76,24 @@ function EventGrid({
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {events.map((event) => (
-        <CardForSport key={event.id} event={event} sport={sport} getLogoUrl={getLogoUrl} />
-      ))}
+      {events.map((event) => {
+        const linkable = hasDetailPage(event.sportKey);
+        const card = (
+          <CardForSport key={event.id} event={event} sport={sport} getLogoUrl={getLogoUrl} />
+        );
+
+        if (!linkable) return <div key={event.id}>{card}</div>;
+
+        return (
+          <a
+            key={event.id}
+            href={eventDetailHash(event.id)}
+            className="block rounded-lg transition-shadow hover:shadow-md hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50"
+          >
+            {card}
+          </a>
+        );
+      })}
     </div>
   );
 }
