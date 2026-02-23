@@ -95,6 +95,7 @@ export function useSportData(
   accessibleCompetitions: string[],
   selectedSport: SportKey | "all",
   stadiumMaps: StadiumMaps,
+  competitionLabels: Record<string, string> = {},
 ): { data: SportDataMap; lastPolled: Date | null } {
   const [data, setData] = useState<SportDataMap>({});
   const [lastPolled, setLastPolled] = useState<Date | null>(null);
@@ -156,7 +157,7 @@ export function useSportData(
             return transformSoccerGames(
               responseData as Parameters<typeof transformSoccerGames>[0],
               comp,
-              undefined,
+              competitionLabels[comp],
               { venueMap: stadiumMaps["soccer"] },
             );
           }),
@@ -273,7 +274,7 @@ export function useSportData(
 
     // Reset lastPolled when date/sports change
     setLastPolled(null);
-  }, [date, accessibleSports, accessibleCompetitions, seasonCache, updateSport, stadiumMaps]);
+  }, [date, accessibleSports, accessibleCompetitions, competitionLabels, seasonCache, updateSport, stadiumMaps]);
 
   // Polling effect: re-fetch selected sport every 5 seconds on today's date
   useEffect(() => {
@@ -303,6 +304,7 @@ export function useSportData(
               return transformSoccerGames(
                 responseData as Parameters<typeof transformSoccerGames>[0],
                 comp,
+                competitionLabels[comp],
               );
             }),
           ),
@@ -344,7 +346,7 @@ export function useSportData(
       active = false;
       clearInterval(interval);
     };
-  }, [date, selectedSport, accessibleSports, accessibleCompetitions, stadiumMaps]);
+  }, [date, selectedSport, accessibleSports, accessibleCompetitions, competitionLabels, stadiumMaps]);
 
   return { data, lastPolled };
 }

@@ -56,6 +56,63 @@ export async function probeCompetitions(competitionKeys: string[]) {
     .map((r) => r.value.key);
 }
 
+/**
+ * Fetches all competitions from the API and returns their keys and display labels.
+ * Labels are formatted as "AreaName Name" with "(Gender)" appended when not "Male".
+ */
+export async function getAllCompetitionInfo(): Promise<{
+  keys: string[];
+  labels: Record<string, string>;
+}> {
+  const { data } = await getCompetitions();
+  if (!data) return { keys: [], labels: {} };
+
+  const keys: string[] = [];
+  const labels: Record<string, string> = {};
+
+  for (const comp of data) {
+    const key = comp.Key;
+    if (!key) continue;
+    keys.push(key);
+
+    const area = comp.AreaName ?? "";
+    const name = comp.Name ?? key;
+    const gender = comp.Gender;
+    const suffix = gender && gender !== "Male" ? ` (${gender})` : "";
+    labels[key] = `${area} ${name}${suffix}`.trim();
+  }
+
+  return { keys, labels };
+}
+
+/**
+ * Probes competitions in batches to avoid overwhelming the API.
+ * Returns the list of accessible competition keys.
+ */
+export async function probeCompetitionsBatched(
+  competitionKeys: string[],
+  batchSize = 15,
+): Promise<string[]> {
+  const accessible: string[] = [];
+
+  for (let i = 0; i < competitionKeys.length; i += batchSize) {
+    const batch = competitionKeys.slice(i, i + batchSize);
+    const results = await Promise.allSettled(
+      batch.map(async (key) => {
+        const ok = await probeCompetition(key);
+        return { key, ok };
+      }),
+    );
+    for (const r of results) {
+      if (r.status === "fulfilled" && r.value.ok) {
+        accessible.push(r.value.key);
+      }
+    }
+  }
+
+  return accessible;
+}
+
 /** General probe: checks if the key has access to at least one competition. */
 export async function probe() {
   const { response } = await getCompetitions();

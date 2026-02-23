@@ -36,6 +36,7 @@ export function Scoreboard() {
     state.accessibleCompetitions,
     state.selectedSport,
     stadiumMaps,
+    state.competitionLabels,
   );
 
   const getLogoUrl = useTeamLogos(accessibleKeys);

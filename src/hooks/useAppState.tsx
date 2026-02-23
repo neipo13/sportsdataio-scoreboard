@@ -14,12 +14,6 @@ import { probeAllSports, type SportKey, type SportAccess } from "../sdk/clients/
 import { soccer } from "../sdk/clients/index";
 import { todayIso } from "../sdk/transforms/date-utils";
 
-// Known soccer competitions to probe
-const KNOWN_COMPETITIONS = [
-  "EPL", "MLS", "LIGA", "BUND", "SERA", "LIGUE1",
-  "CL", "EL", "MXLN", "SCA", "SPL", "BEL1",
-];
-
 export type Phase = "needsKey" | "probing" | "ready" | "error";
 
 export interface AppState {
@@ -27,6 +21,7 @@ export interface AppState {
   phase: Phase;
   accessibleSports: SportAccess[];
   accessibleCompetitions: string[];
+  competitionLabels: Record<string, string>;
   selectedDate: string; // ISO date YYYY-MM-DD
   selectedSport: SportKey | "all";
   probeError: string | null;
@@ -35,7 +30,7 @@ export interface AppState {
 type Action =
   | { type: "SET_API_KEY"; key: string }
   | { type: "PROBE_START" }
-  | { type: "PROBE_SUCCESS"; sports: SportAccess[]; competitions: string[] }
+  | { type: "PROBE_SUCCESS"; sports: SportAccess[]; competitions: string[]; competitionLabels: Record<string, string> }
   | { type: "PROBE_ERROR"; error: string }
   | { type: "CLEAR_KEY" }
   | { type: "SET_DATE"; date: string }
@@ -65,6 +60,7 @@ function reducer(state: AppState, action: Action): AppState {
         phase: "ready",
         accessibleSports: action.sports,
         accessibleCompetitions: action.competitions,
+        competitionLabels: action.competitionLabels,
         probeError: null,
       };
     case "PROBE_ERROR":
@@ -76,6 +72,7 @@ function reducer(state: AppState, action: Action): AppState {
         phase: "needsKey",
         accessibleSports: [],
         accessibleCompetitions: [],
+        competitionLabels: {},
         probeError: null,
       };
     case "SET_DATE":
@@ -99,6 +96,7 @@ function initialState(): AppState {
     phase: "needsKey",
     accessibleSports: [],
     accessibleCompetitions: [],
+    competitionLabels: {},
     selectedDate: todayIso(),
     selectedSport: "all",
     probeError: null,
@@ -124,15 +122,8 @@ export function useAppState() {
 async function runProbe(dispatch: Dispatch<Action>) {
   dispatch({ type: "PROBE_START" });
   try {
-    const [sportsResult, competitionsResult] = await Promise.allSettled([
-      probeAllSports(),
-      soccer.probeCompetitions(KNOWN_COMPETITIONS),
-    ]);
-
-    const sports =
-      sportsResult.status === "fulfilled" ? sportsResult.value : [];
-    const competitions =
-      competitionsResult.status === "fulfilled" ? competitionsResult.value : [];
+    // Step 1: Probe all sports
+    const sports = await probeAllSports();
 
     const anyAccessible = sports.some((s) => s.accessible);
     if (!anyAccessible) {
@@ -143,7 +134,18 @@ async function runProbe(dispatch: Dispatch<Action>) {
       return;
     }
 
-    dispatch({ type: "PROBE_SUCCESS", sports, competitions });
+    // Step 2: If soccer is accessible, discover competitions dynamically
+    let competitions: string[] = [];
+    let competitionLabels: Record<string, string> = {};
+
+    const soccerAccess = sports.find((s) => s.key === "soccer");
+    if (soccerAccess?.accessible) {
+      const info = await soccer.getAllCompetitionInfo();
+      competitionLabels = info.labels;
+      competitions = await soccer.probeCompetitionsBatched(info.keys);
+    }
+
+    dispatch({ type: "PROBE_SUCCESS", sports, competitions, competitionLabels });
   } catch (err) {
     dispatch({
       type: "PROBE_ERROR",
