@@ -16,8 +16,18 @@ import { todayIso } from "../sdk/transforms/date-utils";
 
 // Known soccer competitions to probe
 const KNOWN_COMPETITIONS = [
-  "EPL", "MLS", "LIGA", "BUND", "SERA", "LIGUE1",
-  "CL", "EL", "MXLN", "SCA", "SPL", "BEL1",
+  "EPL", "DEB", "UCL", "ESP", "ARP", "ITSA", "NLE", "MLS", "UEL",
+  "COPA", "ACN", "LMX", "FRL1", "RFPL", "BRSA", "EUC", "UEQ",
+  "NCAG", "AUA", "COLI", "FIFA", "COSA", "FPD", "IND", "FIFAF",
+  "TIM", "EFAC", "EFLC", "EL1", "EL2", "ARCL", "SAWQ", "SLIG",
+  "ELC", "GTM", "BRCM", "ASWQ", "AFWQ", "NAWQ", "OWQ", "EWQ",
+  "NOR1", "UPL", "DEN1", "ENL", "UNL", "WEUC", "FIFAW", "LEC",
+  "SPL", "SKC", "J1L", "CONL", "SCOP", "UCOL", "BR2", "PR1",
+  "FR2", "CSL", "ITSB", "ES2", "HR1", "SVK1", "TRSK", "PTC",
+  "CH1", "ATC", "COLA", "AUC", "GRC", "SCOC", "NLC", "BRCO",
+  "BL2", "CWC", "POR1", "CDR", "CDF", "DFBP", "KL1", "J2L",
+  "NWSL", "UWCL", "ICWQ", "J1VL", "J2VL", "ESSC", "MAR1", "EGY1",
+  "CZE1", "BOL1", "ROU1", "BEL1",
 ];
 
 export type Phase = "needsKey" | "probing" | "ready" | "error";
