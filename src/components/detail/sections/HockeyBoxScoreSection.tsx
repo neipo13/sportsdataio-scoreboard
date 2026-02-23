@@ -1,12 +1,16 @@
 "use client";
 
 import type { FetchContext } from "../../../lib/detail-registry";
+import { InjuryTag } from "./InjuryTag";
 
 interface PlayerGame {
   Name?: string | null;
   Team?: string | null;
   Position?: string | null;
   HomeOrAway?: string | null;
+  InjuryStatus?: string | null;
+  InjuryBodyPart?: string | null;
+  InjuryNotes?: string | null;
   // Skater stats
   Goals?: number | null;
   Assists?: number | null;
@@ -84,6 +88,7 @@ function SkatersTable({ players, teamLabel }: { players: PlayerGame[]; teamLabel
             <tr key={`${p.Name}-${i}`} className="border-b border-zinc-100 dark:border-zinc-800">
               <td className="whitespace-nowrap px-2 py-1.5 font-medium text-zinc-900 dark:text-zinc-100">
                 {p.Name ?? "Unknown"}
+                <InjuryTag status={p.InjuryStatus} bodyPart={p.InjuryBodyPart} notes={p.InjuryNotes} />
               </td>
               <td className="px-2 py-1.5 text-zinc-500 dark:text-zinc-400">{p.Position ?? "-"}</td>
               <StatCell value={p.Goals} />
@@ -133,6 +138,7 @@ function GoaliesTable({ players }: { players: PlayerGame[] }) {
               <tr key={`${p.Name}-${i}`} className="border-b border-zinc-100 dark:border-zinc-800">
                 <td className="whitespace-nowrap px-2 py-1.5 font-medium text-zinc-900 dark:text-zinc-100">
                   {p.Name ?? "Unknown"}
+                  <InjuryTag status={p.InjuryStatus} bodyPart={p.InjuryBodyPart} notes={p.InjuryNotes} />
                 </td>
                 <StatCell value={p.GoaltendingShotsAgainst} />
                 <StatCell value={p.GoaltendingGoalsAgainst} />

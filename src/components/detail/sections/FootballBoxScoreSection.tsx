@@ -1,12 +1,16 @@
 "use client";
 
 import type { FetchContext } from "../../../lib/detail-registry";
+import { InjuryTag } from "./InjuryTag";
 
 interface PlayerGame {
   Name?: string | null;
   Team?: string | null;
   Position?: string | null;
   HomeOrAway?: string | null;
+  InjuryStatus?: string | null;
+  InjuryBodyPart?: string | null;
+  InjuryNotes?: string | null;
   // Passing
   PassingAttempts?: number | null;
   PassingCompletions?: number | null;
@@ -92,13 +96,14 @@ function SubTable({
   );
 }
 
-function nameCell(name: string | null | undefined) {
+function nameCell(p: PlayerGame) {
   return (
     <td
       key="name"
       className="whitespace-nowrap px-2 py-1 font-medium text-zinc-900 dark:text-zinc-100"
     >
-      {name ?? "Unknown"}
+      {p.Name ?? "Unknown"}
+      <InjuryTag status={p.InjuryStatus} bodyPart={p.InjuryBodyPart} notes={p.InjuryNotes} />
     </td>
   );
 }
@@ -143,7 +148,7 @@ function TeamSection({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
           title="Passing"
           headers={["Player", "C/ATT", "YDS", "TD", "INT"]}
           rows={passers.map((p) => [
-            nameCell(p.Name),
+            nameCell(p),
             <td key="catt" className="whitespace-nowrap px-2 py-1 text-right tabular-nums text-zinc-700 dark:text-zinc-300">
               {p.PassingCompletions ?? 0}/{p.PassingAttempts ?? 0}
             </td>,
@@ -156,7 +161,7 @@ function TeamSection({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
           title="Rushing"
           headers={["Player", "ATT", "YDS", "AVG", "TD"]}
           rows={rushers.map((p) => [
-            nameCell(p.Name),
+            nameCell(p),
             <StatCell key="att" value={p.RushingAttempts} />,
             <StatCell key="yds" value={p.RushingYards} />,
             <StatCell key="avg" value={p.RushingYardsPerAttempt} decimals={1} />,
@@ -167,7 +172,7 @@ function TeamSection({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
           title="Receiving"
           headers={["Player", "REC", "YDS", "AVG", "TD"]}
           rows={receivers.map((p) => [
-            nameCell(p.Name),
+            nameCell(p),
             <StatCell key="rec" value={p.Receptions} />,
             <StatCell key="yds" value={p.ReceivingYards} />,
             <StatCell key="avg" value={p.ReceivingYardsPerReception} decimals={1} />,
@@ -178,7 +183,7 @@ function TeamSection({ players, teamLabel }: { players: PlayerGame[]; teamLabel:
           title="Defense"
           headers={["Player", "SOLO", "AST", "SACK", "INT", "FF", "PD"]}
           rows={defenders.map((p) => [
-            nameCell(p.Name),
+            nameCell(p),
             <StatCell key="solo" value={p.SoloTackles} />,
             <StatCell key="ast" value={p.AssistedTackles} />,
             <StatCell key="sack" value={p.Sacks} decimals={1} />,

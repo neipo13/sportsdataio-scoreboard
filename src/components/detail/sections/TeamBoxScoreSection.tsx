@@ -1,6 +1,7 @@
 "use client";
 
 import type { FetchContext } from "../../../lib/detail-registry";
+import { InjuryTag } from "./InjuryTag";
 
 interface PlayerGame {
   Name?: string | null;
@@ -8,6 +9,9 @@ interface PlayerGame {
   Position?: string | null;
   Started?: number | null;
   Minutes?: number | null;
+  InjuryStatus?: string | null;
+  InjuryBodyPart?: string | null;
+  InjuryNotes?: string | null;
   Points?: number | null;
   Rebounds?: number | null;
   Assists?: number | null;
@@ -100,6 +104,7 @@ function PlayerTable({
                   {p.Started === 1 && (
                     <span className="ml-1 text-[10px] text-zinc-400">S</span>
                   )}
+                  <InjuryTag status={p.InjuryStatus} bodyPart={p.InjuryBodyPart} notes={p.InjuryNotes} />
                 </td>
                 <td className="px-2 py-1.5 text-zinc-500 dark:text-zinc-400">{p.Position ?? "-"}</td>
                 <StatCell value={p.Minutes} />
