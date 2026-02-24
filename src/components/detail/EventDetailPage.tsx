@@ -44,7 +44,6 @@ const DEFAULT_SB_GROUP = "G1001";
 const SB_GROUP_KEY = "sdio-sportsbook-group";
 
 function getSavedSbGroup(): string {
-  if (typeof window === "undefined") return DEFAULT_SB_GROUP;
   return localStorage.getItem(SB_GROUP_KEY) || DEFAULT_SB_GROUP;
 }
 
@@ -66,7 +65,7 @@ export function EventDetailPage({
   const sportConfig = parsed ? DETAIL_REGISTRY[parsed.sportKey] : undefined;
   const sections = sportConfig?.sections ?? [];
 
-  const [sportsbookGroup, setSportsbookGroup] = useState(getSavedSbGroup);
+  const [sportsbookGroup, setSportsbookGroup] = useState(DEFAULT_SB_GROUP);
   const [sectionStates, setSectionStates] = useState<Record<string, SectionState>>({});
   const [availableTabs, setAvailableTabs] = useState<TabInfo[]>([]);
   const [activeTab, setActiveTab] = useState<string>(initialTab ?? "");
@@ -75,6 +74,12 @@ export function EventDetailPage({
   const probeRanRef = useRef(false);
   const headerInfoRef = useRef<HeaderInfo | null>(null);
   const sectionStatesRef = useRef<Record<string, SectionState>>({});
+
+  // Sync sportsbook group from localStorage after hydration
+  useEffect(() => {
+    const saved = getSavedSbGroup();
+    if (saved !== DEFAULT_SB_GROUP) setSportsbookGroup(saved);
+  }, []);
 
   // Save sportsbook group to localStorage
   const handleSbGroupChange = useCallback((value: string) => {
